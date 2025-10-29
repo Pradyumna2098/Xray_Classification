@@ -8,6 +8,7 @@ import shutil
 import sys
 import tarfile
 import tempfile
+import urllib.error
 import urllib.request
 import zipfile
 from pathlib import Path
@@ -73,7 +74,33 @@ def parse_args() -> argparse.Namespace:
 def download_file(url: str, destination: Path) -> None:
     destination.parent.mkdir(parents=True, exist_ok=True)
     print(f"Downloading dataset from {url}\n -> {destination}")
-    with urllib.request.urlopen(url) as response, destination.open("wb") as output:
+
+    request = urllib.request.Request(url, headers={"User-Agent": "Mozilla/5.0"})
+    try:
+        response = urllib.request.urlopen(request)
+    except urllib.error.HTTPError as error:
+        print(
+            "Failed to download dataset due to an HTTP error.",
+            f"Status: {error.code}",
+            f"Reason: {error.reason}",
+            "If you are behind a corporate proxy, try exporting HTTP(S)_PROXY",
+            "environment variables or manually downloading the archive and",
+            "placing it at the expected path.",
+            sep="\n",
+        )
+        raise
+    except urllib.error.URLError as error:
+        print(
+            "Failed to establish a connection to download the dataset.",
+            f"Reason: {error.reason}",
+            "This often indicates that the environment blocks outbound",
+            "HTTPS traffic. Download the archive manually and place it at",
+            f" {destination}, then rerun the script without --force.",
+            sep="\n",
+        )
+        raise
+
+    with response, destination.open("wb") as output:
         block_size = 1024 * 8
         total_size = response.length or 0
         downloaded = 0
@@ -193,14 +220,20 @@ def main() -> int:
         if args.sha256:
             if not verify_checksum(archive_path, args.sha256):
                 print("Existing archive failed checksum verification; re-downloading.")
-                download_file(args.url, archive_path)
+                try:
+                    download_file(args.url, archive_path)
+                except urllib.error.URLError:
+                    return 1
                 if args.sha256 and not verify_checksum(archive_path, args.sha256):
                     print("Checksum verification failed after re-download.")
                     return 1
         else:
             print("Skipping download because archive already exists. Use --force to re-download.")
     else:
-        download_file(args.url, archive_path)
+        try:
+            download_file(args.url, archive_path)
+        except urllib.error.URLError:
+            return 1
         if args.sha256 and not verify_checksum(archive_path, args.sha256):
             print("Checksum verification failed after download.")
             return 1
