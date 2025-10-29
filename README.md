@@ -66,3 +66,21 @@ cd Xray-Classification
 ```bash
 python scripts/download_data.py
 ```
+
+## 📈 Monitor training runs
+
+Both notebooks now log training curves to TensorBoard (and automatically fall back to Weights & Biases if it is available in the environment). Each training invocation creates a timestamped run directory under `logs/` alongside a matching set of best-performing weights inside `models/`.
+
+To inspect the live metrics locally run:
+
+```bash
+tensorboard --logdir logs --port 6006
+```
+
+Then open <http://localhost:6006> in your browser. The key tabs to check are:
+
+- **Scalars** – shows training/validation loss and accuracy so you can verify convergence and spot overfitting.
+- **Graphs** – visualises the model graph to confirm the architecture being trained.
+- **Learning rate** (from the ReduceLROnPlateau callback) – helps correlate performance plateaus with learning-rate reductions.
+
+If you have Weights & Biases installed, the same metrics (plus system diagnostics) are mirrored to the W&B dashboard under the `xray-classification` project.
