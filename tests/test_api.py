@@ -1,5 +1,6 @@
 """Integration tests for FastAPI endpoints."""
 import io
+import os
 from unittest.mock import Mock, patch
 
 import numpy as np
@@ -7,13 +8,16 @@ import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
 
-from api.main import app
+# Set environment variable to skip model loading in tests
+os.environ["SKIP_MODEL_LOADING"] = "1"
 
 
 @pytest.fixture
 def client():
     """Create test client."""
-    return TestClient(app)
+    from api.main import app
+    with TestClient(app) as test_client:
+        yield test_client
 
 
 @pytest.fixture

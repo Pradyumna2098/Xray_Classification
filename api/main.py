@@ -57,6 +57,13 @@ async def lifespan(app: FastAPI):
     # Startup
     global model_inference, gradcam_explainer, model_name
     
+    # Skip model loading in tests or when explicitly disabled
+    import os
+    if os.getenv("SKIP_MODEL_LOADING") == "1":
+        logger.info("Skipping model loading (test mode)")
+        yield
+        return
+    
     logger.info("Loading model...")
     try:
         # Try to load pretrained model
