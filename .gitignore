@@ -36,7 +36,7 @@ venv.bak/
 
 # TensorFlow / Keras
 logs/
-models/
+/models/
 *.h5
 *.hdf5
 *.weights.h5
