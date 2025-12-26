@@ -2,6 +2,7 @@
 import io
 from unittest.mock import Mock, patch
 
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from PIL import Image
@@ -28,7 +29,6 @@ def mock_model_inference():
 def mock_gradcam():
     """Mock Grad-CAM explainer."""
     with patch("api.main.gradcam_explainer") as mock:
-        import numpy as np
         heatmap = np.random.rand(150, 150)
         overlaid = np.random.randint(0, 255, (150, 150, 3), dtype=np.uint8)
         mock.explain_prediction.return_value = (heatmap, overlaid)

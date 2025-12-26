@@ -244,14 +244,19 @@ async def explain(
             ERROR_COUNT.labels(endpoint="/explain", error_type="invalid_image_format").inc()
             raise HTTPException(status_code=400, detail="Invalid image format")
         
-        # Preprocess image
+        # Keep original image for visualization
+        original_image = image.copy()
+        original_image = original_image.resize((150, 150))
+        original_array = np.array(original_image)
+        
+        # Preprocess image for model inference
         processed_image = preprocess_image(image, target_size=(150, 150), normalize=True)
         
-        # Generate Grad-CAM explanation
-        heatmap, overlaid = gradcam_explainer.explain_prediction(
-            processed_image,
-            alpha=alpha,
-        )
+        # Generate heatmap using processed image
+        heatmap = gradcam_explainer.generate_heatmap(processed_image)
+        
+        # Overlay on original (non-normalized) image for better visualization
+        overlaid = gradcam_explainer.overlay_heatmap(heatmap, original_array, alpha)
         
         # Convert to PIL Image and return
         overlaid_pil = Image.fromarray(overlaid)
