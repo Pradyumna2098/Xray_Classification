@@ -1,0 +1,15 @@
+apiVersion: v2
+name: xray-classification
+description: A Helm chart for X-Ray Classification API
+type: application
+version: 1.0.0
+appVersion: "1.0.0"
+keywords:
+  - machine-learning
+  - deep-learning
+  - medical-imaging
+  - x-ray
+  - classification
+maintainers:
+  - name: Pradyumna2098
+    url: https://github.com/Pradyumna2098/Xray_Classification
