@@ -35,7 +35,8 @@ def mock_gradcam():
     with patch("api.main.gradcam_explainer") as mock:
         heatmap = np.random.rand(150, 150)
         overlaid = np.random.randint(0, 255, (150, 150, 3), dtype=np.uint8)
-        mock.explain_prediction.return_value = (heatmap, overlaid)
+        mock.generate_heatmap.return_value = heatmap
+        mock.overlay_heatmap.return_value = overlaid
         yield mock
 
 
