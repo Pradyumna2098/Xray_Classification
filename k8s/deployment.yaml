@@ -1,0 +1,82 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: xray-api
+  labels:
+    app: xray-api
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: xray-api
+  template:
+    metadata:
+      labels:
+        app: xray-api
+    spec:
+      containers:
+      - name: xray-api
+        image: xray-classification-api:latest
+        imagePullPolicy: IfNotPresent
+        ports:
+        - containerPort: 8000
+          name: http
+        env:
+        - name: PYTHONUNBUFFERED
+          value: "1"
+        - name: MODEL_NAME
+          valueFrom:
+            configMapKeyRef:
+              name: xray-config
+              key: model_name
+        resources:
+          requests:
+            memory: "1Gi"
+            cpu: "500m"
+          limits:
+            memory: "2Gi"
+            cpu: "1000m"
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 30
+          periodSeconds: 10
+          timeoutSeconds: 5
+          failureThreshold: 3
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 8000
+          initialDelaySeconds: 10
+          periodSeconds: 5
+          timeoutSeconds: 3
+          failureThreshold: 3
+        volumeMounts:
+        - name: models
+          mountPath: /app/models
+          readOnly: true
+      volumes:
+      - name: models
+        persistentVolumeClaim:
+          claimName: xray-models-pvc
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: xray-api-service
+  labels:
+    app: xray-api
+spec:
+  type: LoadBalancer
+  selector:
+    app: xray-api
+  ports:
+  - protocol: TCP
+    port: 80
+    targetPort: 8000
+    name: http
+  - protocol: TCP
+    port: 8000
+    targetPort: 8000
+    name: api
