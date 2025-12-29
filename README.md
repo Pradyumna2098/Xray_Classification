@@ -327,6 +327,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 For questions, issues, or contributions, please open an issue on GitHub.
 
----
 
-**Built with ❤️ for production deployment in the German job market**
