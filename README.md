@@ -3,7 +3,7 @@
 [![CI - Test and Build](https://github.com/Pradyumna2098/Xray_Classification/workflows/CI%20-%20Test%20and%20Build/badge.svg)](https://github.com/Pradyumna2098/Xray_Classification/actions)
 [![codecov](https://codecov.io/gh/Pradyumna2098/Xray_Classification/branch/main/graph/badge.svg)](https://codecov.io/gh/Pradyumna2098/Xray_Classification)
 
-**A production-grade deep learning application for chest X-ray classification with explainable AI, RESTful API, comprehensive monitoring, and cloud-ready deployment.**
+**A deep learning application for chest X-ray classification with explainable AI, RESTful API, comprehensive monitoring, and cloud-ready deployment.**
 
 ## 🎯 Overview
 
